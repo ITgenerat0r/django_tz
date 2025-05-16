@@ -447,26 +447,7 @@ nav {
 	<body>
 		<div>
 			{% block menu %}
-				<div id="logout_block">
-					<form action="{% url 'showdb:logout' %}" method="POST">
-						{% csrf_token %}
-						<button class="logout" type="submit" data-item="Выйти">Выйти</button>
-					</form>
-				</div>
-					<nav>
-						<ul class="menuItems">
-							<li class="menu-li"><a class="menu-a" href="{% url 'showdb:orgs' %}" data-item="Организации">Организации</a></li>
-							<!-- <li><a class="menu" href="">Даты </a></li> -->
-							<li class="menu-li"><a class="menu-a" href="{% url 'showdb:mkcb' %}"data-item="МКЦБ">МКЦБ</a></li>
-							<li class="menu-li"><a class="menu-a" href="{% url 'showdb:stations' %}"data-item="Станции">Станции</a></li>
-							<li class="menu-li"><a class="menu-a" href="{% url 'showdb:devices' %}"data-item="Датчики">Датчики</a></li>
-							<li class="menu-li"><a class="menu-a" href="{% url 'showdb:documents' %}"data-item="Документы">Документы</a></li>
-							{% if techsupport %}
-							<li class="menu-li"><a class="menu-a" href="{% url 'tseditor:index' %}"data-item="{{techsupport}}">{{techsupport}}</a></li>
-							{% endif %}
-						</ul>
-					</nav>
-					<hr>
+				
 			{% endblock %}
 		</div>
 		<div>
