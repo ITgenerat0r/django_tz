@@ -85,7 +85,21 @@ def ad_view(request, ad_id):
 
 
 def new_ad(request):
-	return my_ads(request)
+	if not request.user.is_authenticated:
+		return auth(request)
+	form = AdForm()
+	if request.method == 'POST':
+		form = AdForm(request.POST)
+		if form.is_valid():
+			ad = form.save(commit=False)
+			ad.append('user')
+			ad.user = request.user
+			ad.created_at = models.DateTimeField(auto_now_add=True)
+			saved_ad = ad.save()
+			print(f"form.cleaned_data: {form.cleaned_data}")
+			return ad_view(request, saved_ad.id)
+	text = ''
+	return render(request, 'ads/new_ad.html', {'form': form})
 
 
 def create_ad(request):

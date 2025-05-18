@@ -20,13 +20,13 @@ class AdForm(forms.ModelForm):
         self.fields['image_url'] = forms.CharField(label="Ссылка на изображение")
         self.fields['category'] = forms.CharField(label="Категория")
         self.fields['condition'] = forms.CharField(label="Состояние")
+        # self.fields['created_at'] = forms.HiddenInput()
+        # self.fields['user'] = forms.HiddenInput()
 
     class Meta:
         model = Ad
-        fields = ['title', 'description', 'image_url', 'category', 'condition']
+        fields = ['title', 'user', 'description', 'image_url', 'category', 'condition', 'created_at']
 
-    def clean_description(self):
-        return self.cleaned_data.get('description').description
 
 
 
