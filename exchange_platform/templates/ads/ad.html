@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Объявление{% endblock %}
+
+
+{% block menu %}
+<a class="backbutton" href="{% url 'ads:main' %}">Объявления</a>
+{% endblock %}
+
+
+{% block content %}
+	{% if ad %}
+		{{ ad.title }} <br>
+		{{ ad.description }} <br>
+		{% if is_owner %}
+			Is owner.
+		{% endif %}
+	{% endif %}
+{% endblock %}

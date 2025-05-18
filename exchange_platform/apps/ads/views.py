@@ -30,12 +30,7 @@ def auth(request):
 				print(form.cleaned_data)
 		return render(request, 'ads/auth.html', {"form": form})
 	return HttpResponseRedirect( reverse('ads:index'))
-	# # data = Botool.objects.all()[:10]
-	# # data = {'one', 'two', 'three'}
-	# titles = Titles.objects.all()
-	# # devices = Devices.objects.all()
-	# # orgs = Clients.objects.all()
-	# return render(request, 'tseditor/titles.html', {'titles': titles, 'techsupport': 'techsupport'})
+
 
 
 def check_user_access_to_group(request, target_group="editor"):
@@ -56,15 +51,42 @@ def log_in(request):
 	user = authenticate(request, username=username, password=password)
 	if user is not None:
 		login(request, user)
-		# orgs = Clients.objects.all()
-		return HttpResponseRedirect( reverse('ads:index'))
-		# return render(request, 'showdb/orgs.html', {'orgs': orgs})
+		return HttpResponseRedirect( reverse('ads:main'))
 	else:
 		return HttpResponseRedirect( reverse('ads:auth'))
-		# return render(request, 'showdb/auth.html')
 
 def log_out(request):
 	logout(request)
 	return HttpResponseRedirect( reverse('ads:auth'))
-	# return render(request, 'showdb/auth.html')
 
+
+
+
+def my_ads(request):
+	if not request.user.is_authenticated:
+		return auth(request)
+	ads = Ad.objects.filter(user=request.user)
+	return render(request, 'ads/main.html', {'ads': ads})
+
+
+
+def all_ads(request):
+	if not request.user.is_authenticated:
+		return auth(request)
+	ads = Ad.objects.all()
+	return render(request, 'ads/main.html', {'ads': ads})
+
+
+
+def ad_view(request, ad_id):
+	ad = Ad.objects.filter(id=ad_id)
+	is_owner = ad.user == request.user
+	return render(request, 'ads/ad.html', {'ad': ad, 'is_owner': is_owner})
+
+
+def new_ad(request):
+	return my_ads(request)
+
+
+def create_ad(request):
+	pass

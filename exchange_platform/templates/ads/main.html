@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Объявления{% endblock %}
+
+{% block style %}
+	
+{% endblock %}
+
+{% block content %}
+	{% if filter_form %}
+		<div class="filters">
+			<form action="{% url 'ads:main' %}" method="POST">
+				{% csrf_token %}
+				<div class="form-error">{{ text }}</div>
+					<h3>Фильтры:</h3><hr>
+					{% for field in filter_form %}
+						<div class="filter-field">
+							{{ field.label}}<br>
+							{{ field }}
+						</div>
+					{% endfor %}
+				<button class="filter-btn" type="submit">Применить</button>
+			</form>
+		</div>
+	{% endif %}
+	<h2>Объявления</h2><hr>
+	
+	<p><a class="backbutton" href="{% url 'ads:new_ad' %}"><b>Добавить объявление</b></a></p>
+
+	{% if ads %}
+		<div class='content'>
+			<p>Количество: {{ ads|length }}</p>
+			{% for ad in ads %}
+				<div class='cell'>
+					<a href="{% url 'ads:ad' ad.id %}">{{ad.id}}</a>
+					<hr>
+					{{ ad.category }} {{ ad.condition }}<br>
+					{{ ad.description }}<br>
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		Нет объявлений.
+	{% endif %}
+
+
+{% endblock %}

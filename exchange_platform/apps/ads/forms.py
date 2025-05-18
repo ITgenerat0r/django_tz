@@ -9,3 +9,30 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'id': 'password', 'class': 'password'}), label="Пароль")
 
     
+
+
+
+class AdForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'] = forms.CharField(min_length=2, max_length=80, label='Название')
+        self.fields['description'] = forms.CharField(label="Описание")
+        self.fields['image_url'] = forms.CharField(label="Ссылка на изображение")
+        self.fields['category'] = forms.CharField(label="Категория")
+        self.fields['condition'] = forms.CharField(label="Состояние")
+
+    class Meta:
+        model = Ad
+        fields = ['title', 'description', 'image_url', 'category', 'condition']
+
+    def clean_description(self):
+        return self.cleaned_data.get('description').description
+
+
+
+    def set_ad(self, ad):
+        self.fields['title'].initial = ad.title
+        self.fields['description'].initial = ad.description
+        self.fields['image_url'].initial = ad.image_url
+        self.fields['category'].initial = ad.category
+        self.fields['condition'].initial = ad.condition

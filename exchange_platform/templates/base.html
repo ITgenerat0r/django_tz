@@ -447,7 +447,19 @@ nav {
 	<body>
 		<div>
 			{% block menu %}
-				
+				<div id="logout_block">
+					<form action="{% url 'ads:logout' %}" method="POST">
+						{% csrf_token %}
+						<button class="logout" type="submit" data-item="Выйти">Выйти</button>
+					</form>
+				</div>
+					<nav>
+						<ul class="menuItems">
+							<li class="menu-li"><a class="menu-a" href="{% url 'ads:main' %}" data-item="Все Объявления">Все Объявления</a></li>
+							<li class="menu-li"><a class="menu-a" href="{% url 'ads:my_ads' %}"data-item="Мои объявления">Мои объявления</a></li>
+						</ul>
+					</nav>
+					<hr>
 			{% endblock %}
 		</div>
 		<div>
