@@ -3,7 +3,7 @@ from django.http import Http404, HttpResponseRedirect, FileResponse
 from django.urls import reverse
 
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from django.contrib.auth import authenticate, login, logout
 
@@ -11,6 +11,10 @@ from django.contrib.auth import authenticate, login, logout
 
 from .forms import *
 from .models import *
+
+def get_current_time(step=0):
+        # return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        return (datetime.now() + timedelta(seconds=step)).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 def index(request):
@@ -79,7 +83,8 @@ def all_ads(request):
 
 
 def ad_view(request, ad_id):
-	ad = Ad.objects.filter(id=ad_id)
+	print(f"ad_view({ad_id})")
+	ad = Ad.objects.get(id=ad_id)
 	is_owner = ad.user == request.user
 	return render(request, 'ads/ad.html', {'ad': ad, 'is_owner': is_owner})
 
@@ -92,15 +97,58 @@ def new_ad(request):
 		form = AdForm(request.POST)
 		if form.is_valid():
 			ad = form.save(commit=False)
-			ad.append('user')
 			ad.user = request.user
-			ad.created_at = models.DateTimeField(auto_now_add=True)
-			saved_ad = ad.save()
-			print(f"form.cleaned_data: {form.cleaned_data}")
-			return ad_view(request, saved_ad.id)
+			ad.created_at = get_current_time()[:10]
+			ad.save()
+			return ad_view(request, ad.id)
 	text = ''
 	return render(request, 'ads/new_ad.html', {'form': form})
 
 
-def create_ad(request):
-	pass
+def edit_ad(request, ad_id):
+	if not request.user.is_authenticated:
+		return auth(request)
+	ad = Ad.objects.get(id=ad_id)
+	if ad.user == request.user:
+		if request.method == 'POST':
+			form = AdForm(request.POST)
+			if form.is_valid():
+				ad.save()
+				return ad_view(request, ad.id)
+		form = AdForm()
+		if ad:
+			form.set_ad(ad)
+		return render(request, 'ads/edit_ad.html', {'form': form, 'ad_id': ad.id})
+	else:
+		return render(request, 'ads/my_ads')
+
+def update_ad(request, ad_id):
+	if not request.user.is_authenticated:
+		return auth(request)
+	form = AdForm()
+	if request.method == 'POST':
+		form = AdForm(request.POST)
+		if form.is_valid():
+			ad = Ad.objects.get(id=ad_id)
+			if ad and ad.user == request.user:
+				if form.cleaned_data['title']:
+					ad.title = form.cleaned_data['title']
+				if form.cleaned_data['description']:
+					ad.description = form.cleaned_data['description']
+				if form.cleaned_data['image_url']:
+					ad.image_url = form.cleaned_data['image_url']
+				if form.cleaned_data['category']:
+					ad.category = form.cleaned_data['category']
+				if form.cleaned_data['condition']:
+					ad.condition = form.cleaned_data['condition']
+				ad.save()
+	return edit_ad(request, ad_id)
+
+def delete_ad(request, ad_id):
+	if not request.user.is_authenticated:
+		return auth(request)
+	ad = Ad.objects.get(id=ad_id)
+	if ad.user == request.user:
+		Ad.objects.get(id=ad_id).delete()
+	return my_ads(request)
+

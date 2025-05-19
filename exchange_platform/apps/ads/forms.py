@@ -25,7 +25,7 @@ class AdForm(forms.ModelForm):
 
     class Meta:
         model = Ad
-        fields = ['title', 'user', 'description', 'image_url', 'category', 'condition', 'created_at']
+        fields = ['title', 'description', 'image_url', 'category', 'condition']
 
 
 

@@ -32,7 +32,7 @@
 			<p>Количество: {{ ads|length }}</p>
 			{% for ad in ads %}
 				<div class='cell'>
-					<a href="{% url 'ads:ad' ad.id %}">{{ad.id}}</a>
+					<a href="{% url 'ads:ad' ad.id %}">{{ad.id}}. {{ad.title}}</a>
 					<hr>
 					{{ ad.category }} {{ ad.condition }}<br>
 					{{ ad.description }}<br>

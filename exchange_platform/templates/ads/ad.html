@@ -2,17 +2,29 @@
 {% block title %}Объявление{% endblock %}
 
 
-{% block menu %}
-<a class="backbutton" href="{% url 'ads:main' %}">Объявления</a>
-{% endblock %}
+
 
 
 {% block content %}
+
+<p><a class="backbutton" href="{% url 'ads:main' %}">Объявления</a></p>
+
+
 	{% if ad %}
-		{{ ad.title }} <br>
-		{{ ad.description }} <br>
+		Название: {{ ad.title }} <br>
+		Описание: {{ ad.description }} <br>
+		Категория: {{ ad.category }} <br>
+		Состояние: {{ ad.condition }} <br>
+		Автор: {{ ad.user }} <br>
+		Создан: {{ ad.created_at }} <br>
 		{% if is_owner %}
-			Is owner.
+		<p><a href="{% url 'ads:edit_ad' ad.id %}">Редактировать</a></p>
+		<p><a href="{% url 'ads:delete_ad' ad.id %}">Удалить</a></p>
+		{% else %}
+		{% include 'comments.html' with ad_id=ad.id %}<br>
 		{% endif %}
 	{% endif %}
+
+
+
 {% endblock %}
