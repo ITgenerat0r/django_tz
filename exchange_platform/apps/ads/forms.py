@@ -36,3 +36,13 @@ class AdForm(forms.ModelForm):
         self.fields['image_url'].initial = ad.image_url
         self.fields['category'].initial = ad.category
         self.fields['condition'].initial = ad.condition
+
+
+class CommentForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.fields['']
+
+    class Meta:
+        model = ExchangeProposal
+        fields = ['comment', 'status']
