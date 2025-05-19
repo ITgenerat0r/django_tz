@@ -21,7 +21,7 @@
 		<p><a href="{% url 'ads:edit_ad' ad.id %}">Редактировать</a></p>
 		<p><a href="{% url 'ads:delete_ad' ad.id %}">Удалить</a></p>
 		{% else %}
-		{% include 'comments.html' with ad_id=ad.id %}<br>
+		<p><a href="{% url 'ads:new_comment' ad.id "></a> </p>
 		{% endif %}
 	{% endif %}
 
