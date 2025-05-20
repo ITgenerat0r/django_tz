@@ -1,0 +1,28 @@
+
+
+
+{% if proposals %}
+	<div class='content'>
+		<p>Предложений: {{ proposals|length }}</p>
+		{% for proposal in proposals %}
+			<div class='cell'>
+				{{ proposal }}<br>
+				<<{{ proposal.status }}>><br>
+				{% if proposal.status == "Ожидает" %}
+					{% if ad.user == user %}
+						<a href="{% url 'ads:proposal_response' proposal.id 1 %}">Принять</a>
+						<a href="{% url 'ads:proposal_response' proposal.id 0 %}">Отклонить</a>
+					{% else %}
+						{% if proposal.ad_receiver.user == user %}
+							<br><a href="{% url 'ads:delete_comment' proposal.id %}">Отменить предложение</a>
+						{% endif %}
+					{% endif %}
+				{% endif %}
+				
+				<hr>
+			</div>
+		{% endfor %}
+	</div>
+{% else %}
+	<p>Нет предложений.</p>
+{% endif %}

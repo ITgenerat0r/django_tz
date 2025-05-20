@@ -39,10 +39,25 @@ class AdForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields['']
+        choices = [('Ожидает', 'Ожидает'),('Принята', 'Принята'),('Отклонена', 'Отклонена')]
+        self.fields['comment'] = forms.CharField(label="Коментарий")
+        # self.fields['status'] = forms.ChoiceField(
+        #     label="Статус", 
+        #     choices = choices,
+        #     initial = choices[0],
+        #     disabled = True
+        #     )
+
+        self.fields['ad_receiver'] = forms.ModelChoiceField(
+            label='Предложить', 
+            queryset=Ad.objects.filter(user=user, is_bonded=False), 
+            empty_label='Не выбрано'
+            )
+
+
 
     class Meta:
         model = ExchangeProposal
-        fields = ['comment', 'status']
+        fields = ['comment', 'ad_receiver']

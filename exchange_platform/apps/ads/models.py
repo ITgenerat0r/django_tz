@@ -11,6 +11,10 @@ class Ad(models.Model):
 	category = models.CharField(max_length=80, verbose_name="Категория")
 	condition = models.CharField(max_length=80, verbose_name="Состояние")
 	created_at = models.DateField(blank=True, null=True, verbose_name="Дата создания")
+	is_bonded = models.BooleanField(default=False, verbose_name="Забронировано")
+
+	def __str__(self):
+		return f"{self.title}. {self.user}"
 
 
 class ExchangeProposal(models.Model):
@@ -20,3 +24,6 @@ class ExchangeProposal(models.Model):
 	comment = models.CharField(max_length=1000, verbose_name="Категория")
 	status = models.CharField(max_length=20, verbose_name="Состояние")
 	created_at = models.DateField(blank=True, null=True, verbose_name="Дата создания")
+
+	def __str__(self):
+		return f"{self.ad_receiver}: {self.comment} ({self.created_at})"

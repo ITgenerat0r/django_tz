@@ -24,7 +24,7 @@ def index(request):
 	return render(request, 'ads/index.html')
 
 def auth(request):
-	return render(request, 'ads/auth.html')
+	# return render(request, 'ads/auth.html')
 
 	if not request.user.is_authenticated:
 		form = LoginForm()
@@ -33,7 +33,7 @@ def auth(request):
 			if form.is_valid():
 				print(form.cleaned_data)
 		return render(request, 'ads/auth.html', {"form": form})
-	return HttpResponseRedirect( reverse('ads:index'))
+	return HttpResponseRedirect( reverse('ads:main'))
 
 
 
@@ -77,7 +77,7 @@ def my_ads(request):
 def all_ads(request):
 	if not request.user.is_authenticated:
 		return auth(request)
-	ads = Ad.objects.all()
+	ads = Ad.objects.exclude(user=request.user)
 	return render(request, 'ads/main.html', {'ads': ads})
 
 
@@ -85,8 +85,14 @@ def all_ads(request):
 def ad_view(request, ad_id):
 	print(f"ad_view({ad_id})")
 	ad = Ad.objects.get(id=ad_id)
-	is_owner = ad.user == request.user
-	return render(request, 'ads/ad.html', {'ad': ad, 'is_owner': is_owner})
+	proposals = ExchangeProposal.objects.filter(ad_sender=ad)
+	comment_form = CommentForm(request.user)
+	return render(request, 'ads/ad.html', {
+		'ad': ad, 
+		'is_owner': ad.user == request.user,
+		'user': request.user, 
+		'proposals': proposals, 
+		'comment_form':comment_form})
 
 
 def new_ad(request):
@@ -104,6 +110,58 @@ def new_ad(request):
 	text = ''
 	return render(request, 'ads/new_ad.html', {'form': form})
 
+
+def new_comment(request, ad_id):
+	if not request.user.is_authenticated:
+		return auth(request)
+	ad = Ad.objects.get(id=ad_id)
+	if request.method == 'POST':
+		form = CommentForm(request.user, request.POST)
+		if form.is_valid():
+			print(form.cleaned_data)
+			proposal = form.save(commit=False)
+			proposal.ad_sender = ad
+			proposal.status = "Ожидает"
+			proposal.created_at = get_current_time()[:10]
+			proposal.save()
+			print("SAVE")
+			return ad_view(request, ad.id)
+		else:
+			print("NOT VALID")
+			print(form.errors)
+	return ad_view(request, ad.id)
+
+def delete_comment(request, proposal_id):
+	if not request.user.is_authenticated:
+		return auth(request)
+	proposal = ExchangeProposal.objects.get(id=proposal_id)
+	ad_id = proposal.ad_sender.id
+	if proposal.ad_receiver.user == request.user:
+		proposal.delete()
+	return ad_view(request, ad_id)
+
+
+def proposal_response(request, proposal_id, res):
+	if not request.user.is_authenticated:
+		return auth(request)
+	proposal = ExchangeProposal.objects.get(id=proposal_id)
+	ad_id = proposal.ad_sender.id
+	if proposal.ad_sender.user == request.user:
+		if res:
+			ad_sender = Ad.objects.get(id=proposal.ad_sender.id)
+			ad_receiver = Ad.objects.get(id=proposal.ad_receiver.id)
+			if not ad_sender.is_bonded and not ad_receiver.is_bonded:
+				ad_sender.is_bonded = True
+				ad_receiver.is_bonded = True
+				proposal.status = "Принят"
+				ad_sender.save()
+				ad_receiver.save()
+				proposals = ExchangeProposal.objects.filter(ad_receiver=ad_receiver, status="Ожидает")
+				proposals.delete()
+		else:
+			proposal.status = "Отклонен"
+		proposal.save()
+	return ad_view(request, ad_id)
 
 def edit_ad(request, ad_id):
 	if not request.user.is_authenticated:
